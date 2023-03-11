@@ -8,27 +8,14 @@ import (
 
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/joho/godotenv"
-	"wow/commande/commandes"
+	"wow/commandes"
+	"wow/tokens"
 )
 
 func main() {
-	// Charger les variables d'environnement depuis le fichier .env
-	err := godotenv.Load()
-	if err != nil {
-		fmt.Println("Error loading .env file: ", err)
-		return
-	}
-
-	// Récupérer le token de bot depuis les variables d'environnement
-	token, ok := os.LookupEnv("BOT_TOKEN")
-	if !ok {
-		fmt.Println("BOT_TOKEN environment variable not found.")
-		return
-	}
 
 	// Créer une nouvelle session DiscordGo en utilisant le token de bot
-	dg, err := discordgo.New("Bot " + token)
+	dg, err := discordgo.New("Bot " + token.BotToken())
 	if err != nil {
 		fmt.Println("Error creating Discord session: ", err)
 		return

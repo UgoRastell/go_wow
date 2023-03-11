@@ -6,7 +6,12 @@ import (
     "net/http"
 	"os"
 	"io"
+
+    "wow/tokens"
 )
+
+
+
 
 // Les données des montures sont stockées dans la propriété "mounts" de la réponse de l'API.
 
@@ -25,11 +30,10 @@ type MountsResponse struct {
 }
 
 
-
-
 func MountIndex() {
+    
     // Définir l'URL de l'API Blizzard
-    url := "https://eu.api.blizzard.com/data/wow/mount/index?namespace=static-eu&locale=fr_FR&access_token=EUj0pcNc29UIRkc3IE5D5drxZRKxNENcyC"
+    url := "https://eu.api.blizzard.com/data/wow/mount/index?namespace=static-eu&locale=fr_FR&access_token=" + token.Access()
 
     // Envoyer une requête GET à l'API Blizzard
     resp, err := http.Get(url)

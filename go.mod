@@ -1,4 +1,4 @@
-module wow/commande
+module wow
 
 
 go 1.20
