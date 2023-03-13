@@ -83,7 +83,6 @@ func DataMount() ([]MountInfos, error){
 		
 		mountInfosList = append(mountInfosList, newMountInfos)
 	}
-	fmt.Println(mountInfosList[1])
 
 	return mountInfosList, nil
 }

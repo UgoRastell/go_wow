@@ -52,6 +52,5 @@ func MountIndex() ([]Mount, error) {
     mounts := make([]Mount, len(mountsResponse.Mounts))
     copy(mounts, mountsResponse.Mounts)
 
-
     return mounts, nil
 }

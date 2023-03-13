@@ -14,17 +14,18 @@ type MountImg struct {
 }
 
 type urlImg struct {
+    Key   string `json:"key"`
     Value string `json:"value"`
 }
 
-func DataImg() ([]string, error){
+func DataImg() ([]MountImg, error){
     mounts, err := DataMount()
     if err != nil {
         fmt.Println("Erreur :", err)
         return nil, err
     }
 
-    var imgURLs []string
+    var imgURLs []MountImg
 
     for _, mount := range mounts {
         if len(mount.CreatureDisplays) > 0 {
@@ -44,16 +45,17 @@ func DataImg() ([]string, error){
                 return nil, err
             }
 
-			newMountUrls := MountImg{
-				Id: mountImg.Id,
-				URL: url,
-			}
-
-			imgURLs = append(imgURLs, newMountUrls)
-			fmt.Println(imgURLs)
-
-            fmt.Println(mountImg.Id)
+            
+            newMountURL := MountImg{
+                Id: mountImg.Id,
+                Assets: mountImg.Assets,
+            }
+            imgURLs = append(imgURLs, newMountURL)
+            
         }
+        
     }
+
     return imgURLs, nil
 }
+

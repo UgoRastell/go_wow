@@ -32,7 +32,7 @@ func main() {
 
 	// Attendre un signal pour fermer le bot
 	fmt.Println("Bot is now running.")
-	data.DataImg()
+	data.MountIndex()
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, syscall.SIGTERM)
 	<-sc
