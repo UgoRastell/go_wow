@@ -1,0 +1,242 @@
+[
+    {
+        "id": 207,
+        "name": {
+            "name": "Loup noir"
+        },
+        "description": {
+            "description": "Ses hurlements résonnent à des lieues à la ronde."
+        },
+        "requirements": {
+            "faction": {
+                "type": "ALLIANCE",
+                "name": {
+                    "de_DE": "Horde",
+                    "en_GB": "Horde",
+                    "en_US": "Horde",
+                    "es_ES": "Horda",
+                    "es_MX": "Horda",
+                    "fr_FR": "Horde",
+                    "it_IT": "Orda",
+                    "ko_KR": "호드",
+                    "pt_BR": "Horda",
+                    "ru_RU": "Орда",
+                    "zh_CN": "部落",
+                    "zh_TW": "部落"
+                }
+            }
+        },
+        "source": {
+            "type": "",
+            "name": {
+                "source": "Vendeur"
+            }
+        },
+        "creature_displays": [
+            {
+                "key": {
+                    "href": "https://eu.api.blizzard.com/data/wow/media/creature-display/92666?namespace=static-10.0.7_48520-eu"
+                },
+                "id": 92666
+            }
+        ],
+        "medias": [
+            {
+                "assets": null,
+                "id": 207
+            }
+        ]
+    },
+    {
+        "id": 247,
+        "name": {
+            "name": "Loup des bois"
+        },
+        "description": {
+            "description": "Ses hurlements résonnent à des lieues à la ronde."
+        },
+        "requirements": {
+            "faction": {
+                "type": "HORDE",
+                "name": {
+                    "de_DE": "Horde",
+                    "en_GB": "Horde",
+                    "en_US": "Horde",
+                    "es_ES": "Horda",
+                    "es_MX": "Horda",
+                    "fr_FR": "Horde",
+                    "it_IT": "Orda",
+                    "ko_KR": "호드",
+                    "pt_BR": "Horda",
+                    "ru_RU": "Орда",
+                    "zh_CN": "部落",
+                    "zh_TW": "部落"
+                }
+            }
+        },
+        "source": {
+            "type": "",
+            "name": {
+                "source": "Vendeur"
+            }
+        },
+        "creature_displays": [
+            {
+                "key": {
+                    "href": "https://eu.api.blizzard.com/data/wow/media/creature-display/92666?namespace=static-10.0.7_48520-eu"
+                },
+                "id": 92666
+            }
+        ],
+        "medias": [
+            {
+                "assets": null,
+                "id": 247
+            }
+        ]
+    },
+    {
+        "id": 1166,
+        "name": {
+            "name": "Loup blanc"
+        },
+        "description": {
+            "description": "De vieilles légendes furbolg racontent que les loups au pelage blanc ont reçu la bénédiction des deux lunes d’Azeroth."
+        },
+        "requirements": {
+            "faction": {
+                "type": "HORDE",
+                "name": {
+                    "de_DE": "Horde",
+                    "en_GB": "Horde",
+                    "en_US": "Horde",
+                    "es_ES": "Horda",
+                    "es_MX": "Horda",
+                    "fr_FR": "Horde",
+                    "it_IT": "Orda",
+                    "ko_KR": "호드",
+                    "pt_BR": "Horda",
+                    "ru_RU": "Орда",
+                    "zh_CN": "部落",
+                    "zh_TW": "部落"
+                }
+            }
+        },
+        "source": {
+            "type": "",
+            "name": {
+                "source": "Vendeur"
+            }
+        },
+        "creature_displays": [
+            {
+                "key": {
+                    "href": "https://eu.api.blizzard.com/data/wow/media/creature-display/92666?namespace=static-10.0.7_48520-eu"
+                },
+                "id": 92666
+            }
+        ],
+        "medias": [
+            {
+                "assets": null,
+                "id": 1166
+            }
+        ]
+    },
+    {
+        "id": 1166,
+        "name": {
+            "name": "Loup arctique"
+        },
+        "description": {
+            "description": "On croyait cette espèce éteinte, mais ce loup peut encore être aperçu en compagnie de quelques vétérans de la Horde."
+        },
+        "requirements": {
+            "faction": {
+                "type": "HORDE",
+                "name": {
+                    "de_DE": "Horde",
+                    "en_GB": "Horde",
+                    "en_US": "Horde",
+                    "es_ES": "Horda",
+                    "es_MX": "Horda",
+                    "fr_FR": "Horde",
+                    "it_IT": "Orda",
+                    "ko_KR": "호드",
+                    "pt_BR": "Horda",
+                    "ru_RU": "Орда",
+                    "zh_CN": "部落",
+                    "zh_TW": "部落"
+                }
+            }
+        },
+        "source": {
+            "type": "",
+            "name": {
+                "source": "Butin"
+            }
+        },
+        "creature_displays": [
+            {
+                "key": {
+                    "href": "https://eu.api.blizzard.com/data/wow/media/creature-display/92666?namespace=static-10.0.7_48520-eu"
+                },
+                "id": 92666
+            }
+        ],
+        "medias": [
+            {
+                "assets": null,
+                "id": 1166
+            }
+        ]
+    },
+    {
+        "id": 207,
+        "name": {
+            "name": "Loup noir"
+        },
+        "description": {
+            "description": "Ses hurlements résonnent à des lieues à la ronde."
+        },
+        "requirements": {
+            "faction": {
+                "type": "HORDE",
+                "name": {
+                    "de_DE": "Horde",
+                    "en_GB": "Horde",
+                    "en_US": "Horde",
+                    "es_ES": "Horda",
+                    "es_MX": "Horda",
+                    "fr_FR": "Horde",
+                    "it_IT": "Orda",
+                    "ko_KR": "호드",
+                    "pt_BR": "Horda",
+                    "ru_RU": "Орда",
+                    "zh_CN": "部落",
+                    "zh_TW": "部落"
+                }
+            }
+        },
+        "source": {
+            "type": "",
+            "name": {
+                "source": "Vendeur"
+            }
+        },
+        "creature_displays": [
+            {
+                "key": {
+                    "href": "https://eu.api.blizzard.com/data/wow/media/creature-display/92666?namespace=static-10.0.7_48520-eu"
+                },
+                "id": 92666
+            }
+        ],
+        "medias": [
+            {
+                "assets": null,
+                "id": 207
+            }
+        ]
+    }
+]

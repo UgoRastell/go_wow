@@ -6,10 +6,10 @@ import (
 	"os/signal"
 	"syscall"
 
+	data "wow/Mountdata"
+	token "wow/tokens"
 
 	"github.com/bwmarrin/discordgo"
-	"wow/tokens"
-	"wow/Mountdatas"
 )
 
 func main() {
@@ -27,19 +27,11 @@ func main() {
 		fmt.Println("Error connecting to Discord: ", err)
 		return
 	}
-	
-	
-
-	// Attendre un signal pour fermer le bot
+	data.Data()
 	fmt.Println("Bot is now running.")
-	data.MountIndex()
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, syscall.SIGTERM)
 	<-sc
 
-	// Fermer la session DiscordGo
 	dg.Close()
 }
-
-
-
