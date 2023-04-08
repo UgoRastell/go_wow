@@ -45,7 +45,6 @@ func DataMount() ([]MountInfos, error) {
     }
 
     var mountInfosList []MountInfos
-    var mountInfos MountInfos
 
     for _, mount := range mounts {
         url := mount.URL.Href
@@ -57,33 +56,47 @@ func DataMount() ([]MountInfos, error) {
         }
         defer resp.Body.Close()
 
+        var mountInfos MountInfos
         err = json.NewDecoder(resp.Body).Decode(&mountInfos)
         if err != nil {
             fmt.Println("Erreur :", err)
             return nil, err
         }
 
-        newSource := MountSource{
-            Name: map[string]string{
-                "source": mountInfos.Source.Name["fr_FR"],
-            },
-        }
+        creatureDisplays := mountInfos.CreatureDisplays
+        if len(creatureDisplays) > 0 {
+            newSource := MountSource{
+                Name: map[string]string{
+                    "source": mountInfos.Source.Name["fr_FR"],
+                },
+            }
 
-        newMountInfos := MountInfos{
-            ID: mountInfos.CreatureDisplays[0].ID,
-            Name: map[string]string{
-                "name": mountInfos.Name["fr_FR"],
-            },
-            Description: map[string]string{
-                "description": mountInfos.Description["fr_FR"],
-            },
-            Faction: mountInfos.Faction,
-            Source: newSource,
-            CreatureDisplays: mountInfos.CreatureDisplays,
-        }
+            newMountInfos := MountInfos{
+                ID: mountInfos.CreatureDisplays[0].ID,
+                Name: map[string]string{
+                    "name": mountInfos.Name["fr_FR"],
+                },
+                Description: map[string]string{
+                    "description": mountInfos.Description["fr_FR"],
+                },
+                Faction: mountInfos.Faction,
+                Source: newSource,
+                CreatureDisplays: []CreatureDisplay{
+                    {
+                        Key: struct {
+                            Href string `json:"href"`
+                        }{
+                            Href: mountInfos.CreatureDisplays[0].Key.Href,
+                        },
+                        ID: mountInfos.CreatureDisplays[0].ID,
+                    },
+                },
+            }            
 
-        mountInfosList = append(mountInfosList, newMountInfos)
+            mountInfosList = append(mountInfosList, newMountInfos)
+        }
     }
 
     return mountInfosList, nil
 }
+

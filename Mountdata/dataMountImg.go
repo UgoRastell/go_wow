@@ -4,8 +4,6 @@ import (
     "encoding/json"
     "fmt"
     "net/http"
-
-    "wow/tokens"
 )
 
 type MountKey struct {
@@ -21,6 +19,14 @@ type MountMedia struct {
     ID int `json:"id"`
 }
 
+type MountMediaResponse struct {
+    ID     int    `json:"id"`
+    Assets []struct {
+        Key   string `json:"key"`
+        Value string `json:"value"`
+    } `json:"assets"`
+}
+
 func DataMountMedia() ([]MountMedia, error) {
     mounts, err := MountIndex()
     if err != nil {
@@ -29,48 +35,43 @@ func DataMountMedia() ([]MountMedia, error) {
     }
 
     var mountMediaList []MountMedia
-
     for _, mount := range mounts {
         url := mount.URL.Href
 
-        resp, err := http.Get(url + "&access_token=" + token.Access())
+        resp, err := http.Get(url)
         if err != nil {
             fmt.Println("Erreur :", err)
             return nil, err
         }
         defer resp.Body.Close()
 
-        var mountMedia MountMedia
-        err = json.NewDecoder(resp.Body).Decode(&mountMedia)
+        var mediaResponse MountMediaResponse
+        err = json.NewDecoder(resp.Body).Decode(&mediaResponse)
         if err != nil {
             fmt.Println("Erreur :", err)
             return nil, err
         }
 
         mediaList := make([]struct {
-            ID    int
-            Key   string
-            Value string
+            Key   string `json:"key"`
+            Value string `json:"value"`
         }, 0)
 
-        for _, asset := range mountMedia.Assets {
+        for _, asset := range mediaResponse.Assets {
             mediaList = append(mediaList, struct {
-                ID    int
-                Key   string
-                Value string
+                Key   string `json:"key"`
+                Value string `json:"value"`
             }{
-                ID:    mountMedia.ID,
                 Key:   asset.Key,
                 Value: asset.Value,
             })
         }
 
-        for _, media := range mediaList {
-            fmt.Printf("%+v\n", media)
-        }
-
-        mountMediaList = append(mountMediaList, mountMedia)
+        mountMediaList = append(mountMediaList, MountMedia{
+            ID:     mediaResponse.ID,
+            Assets: mediaList,
+        })
     }
-
+    fmt.Println(mountMediaList)
     return mountMediaList, nil
 }
