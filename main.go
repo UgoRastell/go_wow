@@ -6,8 +6,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	data "wow/Mountdata"
-	token "wow/tokens"
+	"wow/Mountdata"
+	"wow/tokens"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -27,7 +27,7 @@ func main() {
 		fmt.Println("Error connecting to Discord: ", err)
 		return
 	}
-	data.Data()
+	data.DataMountMedia()
 	fmt.Println("Bot is now running.")
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, syscall.SIGTERM)

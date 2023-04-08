@@ -1,85 +1,102 @@
 package data
 
 import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
+    "encoding/json"
+    "fmt"
+    "io/ioutil"
+    "strconv"
 )
 
-// Data récupère les informations des montures et des médias associés, et crée un fichier JSON par monture contenant toutes les informations.
-func Data() {
-	// Récupération des informations des montures
-	mounts, err := DataMount()
-	if err != nil {
-		fmt.Println("Erreur :", err)
-		return
-	}
+type MountData struct {
+    ID               int                 `json:"id"`
+    Name             map[string]string   `json:"name"`
+    Description      map[string]string   `json:"description"`
+    Faction          MountFaction        `json:"faction"`
+    Source           MountSource         `json:"source"`
+    CreatureDisplays []CreatureDisplay   `json:"creature_displays"`
+    Assets           []MountMediaAsset   `json:"assets"`
+}
 
-	// Récupération des médias des montures
-	medias, err := DataMountMedia()
-	if err != nil {
-		fmt.Println("Erreur :", err)
-		return
-	}
+type MountMediaAsset struct {
+    Key   string `json:"key"`
+    Value string `json:"value"`
+}
 
-	// Création d'une map pour associer les médias aux montures par id
-	mediasMap := make(map[int][]MountMedia)
-	for _, media := range medias {
-		mediasMap[media.ID] = append(mediasMap[media.ID], media)
-	}
+func Data(mountInfosList []MountInfos, mountMediaList []MountMedia) []MountData {
+    mountDataMap := make(map[int]MountData)
 
-	// Parcours des montures pour créer un fichier par id de monture
-	for _, mount := range mounts {
-		// Récupération des médias associés à cette monture
-		mountMedias, ok := mediasMap[mount.ID]
-		if !ok {
-			fmt.Printf("Aucun média trouvé pour la monture avec l'id %d\n", mount.ID)
-			continue
-		}
+    for _, mountInfo := range mountInfosList {
+        mountDataMap[mountInfo.ID] = MountData{
+            ID:               mountInfo.ID,
+            Name:             mountInfo.Name,
+            Description:      mountInfo.Description,
+            Faction:          mountInfo.Faction.Faction,
+            Source:           mountInfo.Source,
+            CreatureDisplays: mountInfo.CreatureDisplays,
+        }
+    }
 
-		// Récupération de la bonne image pour chaque créature_display
-		for i, creatureDisplay := range mount.CreatureDisplays {
-			for _, media := range mountMedias {
-				if media.Key.Href == creatureDisplay.Key.Href {
-					mount.CreatureDisplays[i].ID = media.ID
-					break
-				}
-			}
-		}
+    for _, mountMedia := range mountMediaList {
+        mountData, ok := mountDataMap[mountMedia.ID]
+        if ok {
+            assets := make([]MountMediaAsset, len(mountMedia.Assets))
+            for i, asset := range mountMedia.Assets {
+                assets[i] = MountMediaAsset{
+                    Key:   asset.Key,
+                    Value: asset.Value,
+                }
+            }
+            mountData.Assets = assets
+            mountDataMap[mountMedia.ID] = mountData
+        }
+    }
 
-		// Conversion de la monture et de ses médias en JSON
-		mountWithMedia := struct {
-			ID             int                    `json:"id"`
-			Name           map[string]string     `json:"name"`
-			Description    map[string]string     `json:"description"`
-			Requirements   MountRequirements     `json:"requirements"`
-			Source         MountSource           `json:"source"`
-			CreatureDisplays []MountCreatureDisplay `json:"creature_displays"`
-			Medias         []MountMedia           `json:"medias"`
-		}{
-			ID:             mount.ID,
-			Name:           mount.Name,
-			Description:    mount.Description,
-			Requirements:   mount.Requirements,
-			Source:         mount.Source,
-			CreatureDisplays: mount.CreatureDisplays,
-			Medias:         mountMedias,
-		}
+    mountDataList := make([]MountData, len(mountDataMap))
+    i := 0
+    for _, mountData := range mountDataMap {
+        mountDataList[i] = mountData
+        i++
+    }
 
-		// Écriture du fichier JSON
-		mountWithMediaJSON, err := json.MarshalIndent(mountWithMedia, "", "    ")
-		if err != nil {
-			fmt.Printf("Erreur lors de la conversion de la monture avec l'id %d en JSON : %v\n", mount.ID, err)
-			continue
-		}
+    return mountDataList
+}
 
-		filename := fmt.Sprintf("mount_%d.json", mount.ID)
-		err = ioutil.WriteFile(filename, mountWithMediaJSON, 0644)
-		if err != nil {
-			fmt.Printf("Erreur lors de l'écriture du fichier %s : %v\n", filename, err)
-			continue
-		}
+func WriteMountDataToFile(mountDataList []MountData, filePath string) error {
+    jsonData, err := json.Marshal(mountDataList)
+    if err != nil {
+        fmt.Println("Erreur :", err)
+        return err
+    }
 
-		fmt.Printf("Fichier %s créé avec succès\n", filename)
-	}
+    err = ioutil.WriteFile(filePath, jsonData, 0644)
+    if err != nil {
+        fmt.Println("Erreur :", err)
+        return err
+    }
+
+    return nil
+}
+
+func Run() {
+    mountInfosList, err := DataMount()
+    if err != nil {
+        fmt.Println("Erreur :", err)
+        return
+    }
+
+    mountMediaList, err := DataMountMedia()
+    if err != nil {
+        fmt.Println("Erreur :", err)
+        return
+    }
+
+    mountDataList := Data(mountInfosList, mountMediaList)
+
+    err = WriteMountDataToFile(mountDataList, "mountData.json")
+    if err != nil {
+        fmt.Println("Erreur :", err)
+        return
+    }
+
+    fmt.Println(strconv.Itoa(len(mountDataList)) + " montures fusionnées et écrites dans mountData.json")
 }
