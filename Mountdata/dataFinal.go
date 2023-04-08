@@ -13,7 +13,7 @@ type MountData struct {
     Description      map[string]string   `json:"description"`
     Faction          MountFaction        `json:"faction"`
     Source           MountSource         `json:"source"`
-    CreatureDisplays []CreatureDisplay   `json:"creature_displays"`
+    CreatureDisplays []CreatureDisplay   `json:"-"`
     Assets           []MountMediaAsset   `json:"assets"`
 }
 

@@ -96,7 +96,5 @@ func DataMount() ([]MountInfos, error) {
             mountInfosList = append(mountInfosList, newMountInfos)
         }
     }
-
     return mountInfosList, nil
 }
-

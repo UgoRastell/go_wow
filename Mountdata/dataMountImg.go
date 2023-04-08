@@ -1,43 +1,54 @@
 package data
 
 import (
-    "encoding/json"
-    "fmt"
-    "net/http"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"wow/tokens"
 )
 
-type MountKey struct {
-    ID  int    `json:"id"`
-    Key string `json:"key"`
+type Creature struct {
+	CreatureDisplays []struct {
+		Key struct {
+			Href string `json:"href"`
+		} `json:"key"`
+	} `json:"creature_displays"`
+	// Autres champs dans votre structure Creature
 }
 
 type MountMedia struct {
-    Assets []struct {
-        Key   string `json:"key"`
-        Value string `json:"value"`
-    } `json:"assets"`
-    ID int `json:"id"`
+	Assets []struct {
+		Key      string `json:"key"`
+		Value    string `json:"value"`
+		KeyFrom  string `json:"key_from,omitempty"`
+	} `json:"assets"`
+	ID int `json:"id"`
 }
 
 type MountMediaResponse struct {
-    ID     int    `json:"id"`
-    Assets []struct {
-        Key   string `json:"key"`
-        Value string `json:"value"`
-    } `json:"assets"`
+	Assets []struct {
+		Key      string `json:"key"`
+		Value    string `json:"value"`
+		Assets   []struct {
+			Value string `json:"value"`
+		} `json:"assets"`
+		KeyFrom  string `json:"key_from,omitempty"`
+	} `json:"assets"`
+	ID int `json:"id"`
 }
 
+
+
 func DataMountMedia() ([]MountMedia, error) {
-    mounts, err := MountIndex()
+    creatures, err := DataMount()
     if err != nil {
         fmt.Println("Erreur :", err)
         return nil, err
     }
 
     var mountMediaList []MountMedia
-    for _, mount := range mounts {
-        url := mount.URL.Href
-
+    for _, creature := range creatures {
+        url := creature.CreatureDisplays[0].Key.Href + "&access_token=" + token.Access()
         resp, err := http.Get(url)
         if err != nil {
             fmt.Println("Erreur :", err)
@@ -52,26 +63,31 @@ func DataMountMedia() ([]MountMedia, error) {
             return nil, err
         }
 
-        mediaList := make([]struct {
-            Key   string `json:"key"`
-            Value string `json:"value"`
-        }, 0)
-
+        // Mise à jour des données dans la structure MountMedia
+        var updatedAssets []struct {
+            Key     string `json:"key"`
+            Value   string `json:"value"`
+            KeyFrom string `json:"key_from,omitempty"`
+        }
         for _, asset := range mediaResponse.Assets {
-            mediaList = append(mediaList, struct {
-                Key   string `json:"key"`
-                Value string `json:"value"`
+            updatedAsset := struct {
+                Key     string `json:"key"`
+                Value   string `json:"value"`
+                KeyFrom string `json:"key_from,omitempty"`
             }{
-                Key:   asset.Key,
-                Value: asset.Value,
-            })
+                Key:     asset.Key,
+                Value:   asset.Value,
+                KeyFrom: asset.KeyFrom,
+            }
+            updatedAssets = append(updatedAssets, updatedAsset)
         }
 
+        // Ajout de la structure mise à jour à la liste
         mountMediaList = append(mountMediaList, MountMedia{
+            Assets: updatedAssets,
             ID:     mediaResponse.ID,
-            Assets: mediaList,
         })
     }
-    fmt.Println(mountMediaList)
     return mountMediaList, nil
 }
+
