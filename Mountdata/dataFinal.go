@@ -5,6 +5,7 @@ import (
     "fmt"
     "io/ioutil"
     "strconv"
+    "wow/Database"
 )
 
 type MountData struct {
@@ -89,12 +90,18 @@ func Run() {
         fmt.Println("Erreur :", err)
         return
     }
-
     mountDataList := Data(mountInfosList, mountMediaList)
 
     err = WriteMountDataToFile(mountDataList, "mountData.json")
     if err != nil {
         fmt.Println("Erreur :", err)
+        return
+    }
+
+    // Insert the document into the "mounts" collection of the "gowow" database
+    err = db.InsertJSON("gowow", "mounts", mountDataList)
+    if err != nil {
+        fmt.Println("Error inserting document: ", err)
         return
     }
 
