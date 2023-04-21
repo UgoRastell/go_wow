@@ -30,7 +30,6 @@ func main() {
 	
 	token.UpdateAccessToken()
 	data.Run()
-	// db.ConnexionDatabase()
 	fmt.Println("Bot is now running.")
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, syscall.SIGTERM)

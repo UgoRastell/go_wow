@@ -4,17 +4,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"wow/Database"
+	db "wow/Database"
 )
 
 type MountData struct {
-	ID               int                 `json:"id"`
-	Name             map[string]string   `json:"name"`
-	Description      map[string]string   `json:"description"`
-	Faction          MountFaction        `json:"faction"`
-	Source           MountSource         `json:"source"`
-	CreatureDisplays []CreatureDisplay   `json:"-"`
-	Assets           []MountMediaAsset   `json:"assets"`
+	ID               int               `json:"id"`
+	Name             map[string]string `json:"name"`
+	Description      map[string]string `json:"description"`
+	Faction          MountFaction      `json:"faction"`
+	Source           MountSource       `json:"source"`
+	CreatureDisplays []CreatureDisplay `json:"-"`
+	Assets           []MountMediaAsset `json:"assets"`
 }
 
 type MountMediaAsset struct {
@@ -88,22 +88,25 @@ func Run() {
 
 	mountDataList := data(mountInfosList, mountMediaList)
 
+	jsonData, err := json.Marshal(mountDataList)
+	if err != nil {
+		return
+	}
+
+	client, err := db.ConnexionDatabase()
+	if err != nil {
+		return
+	}
+
+	err = db.InsertJSON(client, "gowow", "mounts", jsonData)
+	if err != nil {
+		return
+	}
+
 	err = writeMountDataToFile(mountDataList, "mountData.json")
 	if err != nil {
 		fmt.Printf("Erreur lors de l'écriture des données dans le fichier : %v\n", err)
 		return
 	}
-
-    client, err := db.ConnexionDatabase()
-    if err != nil {
-        return
-    }
-    
-    // Insérer un document dans une collection
-    err = db.InsertJSON(client, "gowow", "mounts", mountDataList)
-    if err != nil {
-        return
-    }
-    
 
 }

@@ -40,6 +40,6 @@ func ConnexionDatabase() (*mongo.Client, error) {
         return nil, err
     }
 
-    fmt.Println("Pinged your deployment. You successfully connected to MongoDB!")
+    fmt.Println("You successfully connected to MongoDB!")
     return client, nil
 }
