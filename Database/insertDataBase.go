@@ -1,25 +1,18 @@
 package db
 
 import (
-	"context"
-
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
+    "context"
+    "go.mongodb.org/mongo-driver/mongo"
+    "fmt"
 )
 
-func InsertJSON(client *mongo.Client, dbName, collName string, data interface{}) error {
-	db := client.Database(dbName)
-	coll := db.Collection(collName)
+func InsertDocument(client *mongo.Client, dbName string, collectionName string, document interface{}) error {
+    // Insérer le document dans la collection
+    collection := client.Database(dbName).Collection(collectionName)
+    _, err := collection.InsertOne(context.Background(), document)
+    if err != nil {
+        return fmt.Errorf("Erreur lors de l'insertion du document dans la collection : %v", err)
+    }
 
-	// Vérifier si les données sont dans le bon format
-	bsonData, err := bson.Marshal(data)
-	if err != nil {
-		return err
-	}
-
-	_, err = coll.InsertOne(context.Background(), bsonData)
-	if err != nil {
-		return err
-	}
-	return nil
+    return nil
 }

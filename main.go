@@ -5,11 +5,10 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-
-	"wow/tokens"
-	"wow/Mountdata"
-
+	commande "wow/Commandes"
 	"github.com/bwmarrin/discordgo"
+
+	token "wow/tokens"
 )
 
 func main() {
@@ -27,9 +26,14 @@ func main() {
 		fmt.Println("Error connecting to Discord: ", err)
 		return
 	}
-	
-	token.UpdateAccessToken()
-	data.Run()
+
+	// Ajoute les commandes slash
+	err = commande.AddCommands(dg, "1083387976588984490")
+	if err != nil {
+		fmt.Println("Erreur lors de l'ajout des commandes : ", err)
+		return
+	}
+
 	fmt.Println("Bot is now running.")
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, syscall.SIGTERM)

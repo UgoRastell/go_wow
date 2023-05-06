@@ -6,58 +6,62 @@ import (
 	"io/ioutil"
 	db "wow/Database"
 )
-
 type MountData struct {
-	ID               int               `json:"id"`
-	Name             map[string]string `json:"name"`
-	Description      map[string]string `json:"description"`
-	Faction          MountFaction      `json:"faction"`
-	Source           MountSource       `json:"source"`
-	CreatureDisplays []CreatureDisplay `json:"-"`
-	Assets           []MountMediaAsset `json:"assets"`
+    ID               int               `json:"id"`
+    Name             map[string]string `json:"name"`
+    Description      map[string]string `json:"description"`
+    Faction          MountFaction      `json:"faction"`
+    Source           MountSource       `json:"source"`
+    Assets           []MountMediaAsset `json:"assets"`
 }
-
 type MountMediaAsset struct {
 	Key   string `json:"key"`
 	Value string `json:"value"`
 }
 
 func data(mountInfosList []MountInfos, mountMediaList []MountMedia) []MountData {
-	mountDataMap := make(map[int]MountData)
+    mountDataList := make([]MountData, 0, len(mountInfosList))
+    for _, mountInfo := range mountInfosList {
+        mountData := MountData{
+            ID:               mountInfo.ID,
+            Name:             mountInfo.Name,
+            Description:      mountInfo.Description,
+            Faction:          mountInfo.Faction.Faction,
+            Source:           mountInfo.Source,
+        }
 
-	for _, mountInfo := range mountInfosList {
-		mountDataMap[mountInfo.ID] = MountData{
-			ID:               mountInfo.ID,
-			Name:             mountInfo.Name,
-			Description:      mountInfo.Description,
-			Faction:          mountInfo.Faction.Faction,
-			Source:           mountInfo.Source,
-			CreatureDisplays: mountInfo.CreatureDisplays,
+        for _, mountMedia := range mountMediaList {
+            if mountInfo.ID == mountMedia.ID {
+                assets := make([]MountMediaAsset, len(mountMedia.Assets))
+                for i, asset := range mountMedia.Assets {
+                    assets[i] = MountMediaAsset{
+                        Key:   asset.Key,
+                        Value: asset.Value,
+                    }
+                }
+                mountData.Assets = assets
+            }
+        }
+
+        mountDataList = append(mountDataList, mountData)
+    }
+
+    client, err := db.ConnexionDatabase()
+    if err != nil {
+        fmt.Printf("Erreur lors de la connexion à la base de données : %v\n", err)
+        return nil
+    }
+	for _, mountData := range mountDataList {
+		err = db.InsertDocument(client, "gowow", "mounts", mountData)
+		if err != nil {
+			fmt.Printf("Erreur lors de l'insertion des données dans la collection : %v\n", err)
+			return nil
 		}
 	}
-
-	for _, mountMedia := range mountMediaList {
-		mountData, ok := mountDataMap[mountMedia.ID]
-		if ok {
-			assets := make([]MountMediaAsset, len(mountMedia.Assets))
-			for i, asset := range mountMedia.Assets {
-				assets[i] = MountMediaAsset{
-					Key:   asset.Key,
-					Value: asset.Value,
-				}
-			}
-			mountData.Assets = assets
-			mountDataMap[mountMedia.ID] = mountData
-		}
-	}
-
-	mountDataList := make([]MountData, 0, len(mountDataMap))
-	for _, mountData := range mountDataMap {
-		mountDataList = append(mountDataList, mountData)
-	}
-
-	return mountDataList
+	
+    return mountDataList
 }
+
 
 func writeMountDataToFile(mountDataList []MountData, filePath string) error {
 	jsonData, err := json.Marshal(mountDataList)
@@ -88,20 +92,6 @@ func Run() {
 
 	mountDataList := data(mountInfosList, mountMediaList)
 
-	jsonData, err := json.Marshal(mountDataList)
-	if err != nil {
-		return
-	}
-
-	client, err := db.ConnexionDatabase()
-	if err != nil {
-		return
-	}
-
-	err = db.InsertJSON(client, "gowow", "mounts", jsonData)
-	if err != nil {
-		return
-	}
 
 	err = writeMountDataToFile(mountDataList, "mountData.json")
 	if err != nil {

@@ -39,7 +39,6 @@ func ConnexionDatabase() (*mongo.Client, error) {
     if err = client.Ping(context.Background(), nil); err != nil {
         return nil, err
     }
-
-    fmt.Println("You successfully connected to MongoDB!")
+    
     return client, nil
 }
