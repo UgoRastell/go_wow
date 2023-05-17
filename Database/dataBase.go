@@ -18,7 +18,7 @@ func ConnexionDatabase() (*mongo.Client, error) {
         return nil, err
     }
 
-    // Récupérer le token de bot depuis les variables d'environnement
+    // Récupérer le token depuis les variables d'environnement
     access, ok := os.LookupEnv("MDP_DATABASE")
     if !ok {
         fmt.Println("MDP_DATABASE environment variable not found.")

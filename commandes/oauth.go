@@ -89,6 +89,8 @@ func oauth2LoginRegisterCommand(s *discordgo.Session, i *discordgo.InteractionCr
 		Title:     "Connectez-vous à votre compte Battle.net!",
 	}
 
+	
+
 	blizzardOauth2Config := &oauth2.Config{
 		ClientID:     blizzardClientID,
 		ClientSecret: blizzardClientSecret,
@@ -96,7 +98,7 @@ func oauth2LoginRegisterCommand(s *discordgo.Session, i *discordgo.InteractionCr
 			AuthURL:  "https://eu.battle.net/oauth/authorize",
 			TokenURL: "https://eu.battle.net/oauth/token",
 		},
-		RedirectURL: "http://localhost/blizzard/",
+		RedirectURL: fmt.Sprintf("http://vps-e80a5a0d.vps.ovh.net/battle-net/?user_id=%s", i.Member.User.ID),
 		Scopes:      []string{"openid"},
 	}
 
@@ -139,7 +141,6 @@ func exchangeCodeForToken(code string) (*oauth2.Token, error) {
 			AuthURL:  "https://eu.battle.net/oauth/authorize",
 			TokenURL: "https://eu.battle.net/oauth/token",
 		},
-		RedirectURL: "http://localhost/blizzard/",
 		Scopes:      []string{"openid"},
 	}
 
@@ -203,6 +204,7 @@ func addNewUserToDatabase(client *mongo.Client, guildID string, userID string, u
 		"user_id":  userID,
 		"username": username,
 	}
+
 	err := db.InsertDocument(client, "gowow", "users", user)
 	if err != nil {
 		fmt.Printf("Erreur lors de l'insertion des données dans la collection : %v\n", err)

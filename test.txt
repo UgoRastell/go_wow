@@ -1,0 +1,153 @@
+package main
+
+import (
+        "fmt"
+        "net/http"
+        "os"
+        "time"
+        "github.com/joho/godotenv"
+        "go.mongodb.org/mongo-driver/mongo"
+        "go.mongodb.org/mongo-driver/mongo/options"
+        "go.mongodb.org/mongo-driver/bson"
+        "golang.org/x/oauth2"
+        "context"
+)
+
+type TokenResponse struct {
+        AccessToken string `json:"access_token"`
+        TokenType   string `json:"token_type"`
+        ExpiresIn   int    `json:"expires_in"`
+        Expiry      time.Time
+}
+
+const (
+    blizzardClientID = "4d50be5e687543d0a4754913047a8c3e"
+    blizzardClientSecret = "JztPwWCSK85RlcEfMm4MU74fQrmuiku7"
+)
+
+
+func main() {
+    // Vérifier que la connexion a réussi
+    defer client.Disconnect(context.Background())
+
+    http.HandleFunc("/battle-net/", func(w http.ResponseWriter, r *http.Request) {
+        // Connexion à la base de données MongoDB
+        client, err := ConnexionDatabase()
+        if err != nil {
+            fmt.Println("Impossible de se connecter à la base de données:", err)
+            return
+        }
+
+        code := r.URL.Query().Get("code")
+        idUser := r.URL.Query().Get("user_id")
+        
+        _, err := tokenBattleNet(code, idUser, client)
+        if err != nil {
+            http.Error(w, err.Error(), http.StatusInternalServerError)
+            return
+        }
+        
+
+    })
+
+    http.ListenAndServe(":9990", nil)
+}
+
+
+
+func ConnexionDatabase() (*mongo.Client, error) {
+
+    err := godotenv.Load("./.env")
+    if err != nil {
+        fmt.Println("Error loading .env file: ", err)
+        return nil, err
+    }
+
+    // Récupérer le token de bot depuis les variables d'environnement
+    access, ok := os.LookupEnv("MDP_DATABASE")
+    if !ok {
+        fmt.Println("MDP_DATABASE environment variable not found.")
+        return nil, err
+    }
+
+    // Use the SetServerAPIOptions() method to set the Stable API version to 1
+    serverAPI := options.ServerAPI(options.ServerAPIVersion1)
+    opts := options.Client().ApplyURI("mongodb+srv://GO_U:" + access + "@gowow.qjwmv9s.mongodb.net/test").SetServerAPIOptions(serverAPI)
+
+    // Create a new client and connect to the server
+    client, err := mongo.Connect(context.Background(), opts)
+    if err != nil {
+        return nil, err
+    }
+
+    // Send a ping to confirm a successful connection
+    if err = client.Ping(context.Background(), nil); err != nil {
+        return nil, err
+    }
+
+    return client, nil
+}
+
+
+func addTokenToUser(client *mongo.Client, request TokenResponse, userID string) error {
+    collection := client.Database("gowow").Collection("users")
+
+    filter := bson.M{"user_id": userID}
+    update := bson.M{"$setOnInsert": bson.M{"token": request.AccessToken}}
+
+    _, err := collection.UpdateOne(context.Background(), filter, update, options.Update().SetUpsert(true))
+    if err != nil {
+        fmt.Printf("Erreur lors de la mise à jour du document : %v\n", err)
+        return err
+    }
+
+    return nil
+}
+
+
+func tokenBattleNet(code string, userID string, client *mongo.Client) ([]byte, error) {
+    token, err := exchangeCodeForToken(code, userID)
+    if err != nil {
+        return nil, err
+    }
+
+    // Créer une structure avec les mêmes champs que la variable token
+    response := TokenResponse{
+        AccessToken: token.AccessToken,
+        TokenType:   token.TokenType,
+        ExpiresIn:   int(token.Expiry.Sub(time.Now()).Seconds()),
+    }
+
+
+    // Ajouter le token à l'utilisateur
+    err = addTokenToUser(client, response, userID)
+    if err != nil {
+        fmt.Printf("Erreur lors de l'ajout du token à l'utilisateur : %v\n", err)
+        return nil, err
+    }
+
+    return nil, nil
+}
+
+
+func exchangeCodeForToken(code string, userID string) (*oauth2.Token, error) {
+        blizzardOauth2Config := &oauth2.Config{
+                ClientID:     blizzardClientID,
+                ClientSecret: blizzardClientSecret,
+                Endpoint: oauth2.Endpoint{
+                        AuthURL:  "https://eu.battle.net/oauth/authorize",
+                        TokenURL: "https://eu.battle.net/oauth/token",
+                },
+                RedirectURL: fmt.Sprintf("http://vps-e80a5a0d.vps.ovh.net/battle-net/?user_id=%s", userID),
+                Scopes:      []string{"openid"},
+        }
+
+        token, err := blizzardOauth2Config.Exchange(context.Background(), code)
+        if err != nil {
+                return nil, err
+        }
+        
+        fmt.Printf("Le token généré est : %v\n", token)
+
+        return token, nil
+}
