@@ -23,7 +23,17 @@ func AddCommands(dg *discordgo.Session, guildID string) error {
     }
     _, err = RegisterCommand(dg, guildID, cmd2)
     if err != nil {
-        return fmt.Errorf("Erreur lors de l'ajout de la commande slash 1 : %v", err)
+        return fmt.Errorf("Erreur lors de l'ajout de la commande slash 2 : %v", err)
+    }
+
+    // Commande d'exemple 2
+    cmd3 := &discordgo.ApplicationCommand{
+        Name:        "delete",
+        Description: "Supprime commande",
+    }
+    _, err = RegisterCommand(dg, guildID, cmd3)
+    if err != nil {
+        return fmt.Errorf("Erreur lors de l'ajout de la commande slash 3 : %v", err)
     }
     
     // Ajoute un gestionnaire pour l'événement de commande slash
