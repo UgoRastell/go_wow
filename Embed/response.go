@@ -15,3 +15,16 @@ func ResponseEmbed(embedReponse *discordgo.MessageEmbed, actionRow *discordgo.Ac
 
 	return response
 }
+
+func ResponseEmbedInvisible(embedReponse *discordgo.MessageEmbed, actionRow *discordgo.ActionsRow) *discordgo.InteractionResponse {
+	response := &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Embeds:     []*discordgo.MessageEmbed{embedReponse},
+			Components: []discordgo.MessageComponent{actionRow},
+		},
+	}
+
+	return response
+}
+

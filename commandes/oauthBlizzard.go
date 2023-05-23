@@ -4,21 +4,15 @@ import (
 	"fmt"
 	"math/rand"
 	"time"
-	db "wow/Database"
-	embed "wow/Embed"
+	"wow/Database"
+	"wow/Embed"
 	"wow/tokens"
 	"github.com/bwmarrin/discordgo"
 	"golang.org/x/oauth2"
 )
 
-type TokenResponse struct {
-	AccessToken string `json:"access_token"`
-	TokenType   string `json:"token_type"`
-	ExpiresIn   int    `json:"expires_in"`
-}
-
 const (
-	blizzardClientID     = "4d50be5e687543d0a4754913047a8c3e"
+	blizzardClientID = "4d50be5e687543d0a4754913047a8c3e"
 )
 
 func randomState(length int) string {
@@ -32,13 +26,12 @@ func randomState(length int) string {
 }
 
 func oauth2LoginRegisterCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
-
 	client, err := db.ConnexionDatabase()
 	if err != nil {
 		fmt.Printf("Erreur lors de la connexion à la base de données : %v\n", err)
 		return
 	}
-	
+
 	exists, err := db.CheckUserExists(client, i.GuildID, i.Member.User.ID, i.Member.User.Username)
 	if err != nil {
 		fmt.Printf("Erreur lors de la vérification de l'existence de l'utilisateur : %v\n", err)
@@ -54,14 +47,14 @@ func oauth2LoginRegisterCommand(s *discordgo.Session, i *discordgo.InteractionCr
 
 	fields := []*discordgo.MessageEmbedField{
 		&discordgo.MessageEmbedField{
-			Name:   "Custom Field 1",
-			Value:  "Custom Value 1",
+			Name:   "Instruction",
+			Value:  "Veuillez cliquer sur le bouton pour vous authentifier (le bot ne récupère aucune information personnelle)",
 			Inline: true,
 		},
 	}
-	
-	embedReponse := embed.CreateEmbed("Custom Author", "https://picsum.photos/200", "Custom Description", 
-	fields, "https://example.com/image.jpg", "https://example.com/thumbnail.jpg", "Custom Title", 0xff0000)
+
+	embedReponse := embed.CreateEmbed("GO_WOW", "https://play-lh.googleusercontent.com/PuPFgmLam2WNyul3lUQywQT5Y5sPgL6VzWSUAdXOS1oIQwHYnrB_MyfXCOrR4LzZcjeP=w240-h480-rw", "Permet de se connecter à son compte Battle.net",
+		fields, "Authentification Battle.net", 28889)
 
 	blizzardClientSecret := token.BlizzardClientSecret()
 
@@ -76,28 +69,22 @@ func oauth2LoginRegisterCommand(s *discordgo.Session, i *discordgo.InteractionCr
 		Scopes:      []string{"openid"},
 	}
 
-	// Generate the OAuth2 authentication URL
+	// Génère l'URL d'authentification OAuth2
 	state := randomState(16)
 	url := blizzardOauth2Config.AuthCodeURL(state, oauth2.AccessTypeOnline)
 
 	button1 := embed.CreateButtonUrl("Login", url)
 
-	// Create the action row
+	// Crée la rangée d'actions
 	actionRow := &discordgo.ActionsRow{
 		Components: []discordgo.MessageComponent{button1},
 	}
 
-	// Create the response
-	response := embed.ResponseEmbed(embedReponse , actionRow)
+	// Crée la réponse
+	response := embed.ResponseEmbed(embedReponse, actionRow)
 
 	err = s.InteractionRespond(i.Interaction, response)
 	if err != nil {
-		fmt.Println("Erreur lors de l'envoi: ", err)
+		fmt.Println("Erreur lors de l'envoi : ", err)
 	}
-
 }
-
-
-
-
-

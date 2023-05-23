@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-
+	
 	// Créer une nouvelle session DiscordGo en utilisant le token de bot
 	dg, err := discordgo.New("Bot " + token.BotToken())
 	if err != nil {
@@ -27,6 +27,8 @@ func main() {
 		return
 	}
 
+	
+
 	// Ajoute les commandes slash
 	err = commande.AddCommands(dg, "1083387976588984490")
 	if err != nil {
@@ -34,6 +36,8 @@ func main() {
 		return
 	}
 
+	token.UpdateAccessToken()
+	
 	fmt.Println("Bot is now running.")
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, syscall.SIGTERM)
