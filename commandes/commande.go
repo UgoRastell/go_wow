@@ -2,7 +2,6 @@ package commande
 
 import (
 	"fmt"
-	data "wow/Mountdata"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -14,7 +13,7 @@ func onCommand(s *discordgo.Session, event *discordgo.InteractionCreate) {
 	}
 
 	if event.ApplicationCommandData().Name == "reset_monture" {
-		data.Run(s, event)
+		Run(s, event)
 	}
 
 }
